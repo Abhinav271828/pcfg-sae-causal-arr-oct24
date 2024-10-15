@@ -1,0 +1,91 @@
+deploy: True
+tag: scratch
+seed: 42
+
+device : "cpu"
+bf16: True
+epochs: 1
+
+data:
+  language: 'expr' # ['english', 'expr', 'dyck', 'random']
+  config:
+    # n_nouns: 10 # for english
+    # n_verbs: 10
+    # n_adjectives: 10
+    # n_pronouns: 10
+    # n_adverbs: 10
+    # n_conjunctions: 10
+    # p_conjunctions: 0.15
+    # n_prepositions: 0
+    # relative_clauses: False
+    # transitivity: False
+    n_digits: 10 # for expr
+    n_ops: 3
+    postfix: false
+    # n_brackets: 2 # for dyck
+    # p_nest: 0.5
+
+    # num_features: 32 # for random
+    # num_synonyms: 8
+    # tuple_size: 2
+    # num_layers: 3
+  alpha: 1e5 # depends on the prior type
+  prior_type: 'dirichlet' # ['dirichlet', 'zipfian', 'structured_zeros', 'uniform']
+  max_sample_length: 128
+  num_iters: 1e6
+  batch_size: 128 
+  # CORR: > 0 causes an error in pickling that I didn't understand.
+  num_workers: 0
+
+model:
+  compile: False
+  context_size: 256
+  n_layer: 2
+  n_head: 2
+  n_embd: 128
+  dropout: 0.0
+  bias: False
+  mlp: True
+  use_pretrained: False
+  pretrain_dir: './pretrained/latest_ckpt.pt'
+
+optimizer:
+  learning_rate: 1e-3
+  weight_decay: 1e-4
+  beta1: 0.9
+  beta2: 0.95
+  grad_clip: 1.0
+
+  decay_lr: True
+  warmup_iters: 200
+  min_lr: 9e-4
+
+eval:
+  save_tables: False
+  grammar: True
+
+log: 
+  save_multiple: False
+  log_interval: 10
+  eval_interval: 100
+  save_interval: 100
+  free: False
+
+
+# Nested configs. Disable hydra logging
+defaults:
+  - _self_
+  - override hydra/job_logging: disabled
+  - override hydra/hydra_logging: disabled
+
+# Disable hydra directory structure
+hydra:
+  output_subdir: Null
+  job:
+    chdir: False
+  run:
+    dir: .
+
+  sweep:
+    dir: .
+    subdir: .
